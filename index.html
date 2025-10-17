@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SEAVEN BIO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body {
+            min-height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-image: url('https://www.dropbox.com/scl/fi/qp1opigwcc2k6v18p0iag/mpls.png?rlkey=jdjbztqsr3zhrnquw01cx52jp&st=uhfrlaww&raw=1');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Hapus semua background-color yang ada */
+        .container, .story-container, .choice-container, #score-display {
+            background-color: transparent !important;
+        }
+        h2.title {
+            text-align: center; 
+            margin-top: 40px; 
+            font-size: 2.5rem; 
+            letter-spacing: 2px; 
+            color: #fff; 
+            text-shadow: 
+                0 0 5px #00aaff, 
+                0 0 10px #00aaff, 
+                0 0 15px #7b2ff2, 
+                0 0 20px #7b2ff2, 
+                0 0 25px #7b2ff2, 
+                0 0 30px #7b2ff2;
+        }
+        /* Slider Container */
+        .slider-container {
+            max-width: 1200px;
+            width: 90vw;
+            margin: 40px auto 80px auto;
+            position: relative;
+            overflow: hidden;
+            background: rgba(20, 24, 40, 0.85);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            padding: 24px 0 48px 0;
+        }
+        /* Slides Wrapper */
+        .slides-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            will-change: transform;
+        }
+        /* Each Slide holds 2 cards for layout */
+        .slide {
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        /* Card style - PERBAIKAN: Meningkatkan kontras teks */
+        .biodata-card {
+            background: rgba(40, 44, 60, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+            padding: 24px 18px;
+            width: 280px;
+            text-align: center;
+            transition: transform 0.2s;
+            opacity: 1 !important;
+            transform: none !important;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .biodata-card:hover {
+            transform: scale(1.07);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+            z-index: 10;
+            background: rgba(50, 54, 70, 0.95);
+        }
+        .biodata-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 12px auto;
+            display: block;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .biodata-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.4em;
+            color: #4dc3ff; /* Warna lebih terang untuk kontras lebih baik */
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .biodata-card p {
+            margin: 4px 0;
+            font-size: 1em;
+            color: #f0f0f0; /* Warna lebih terang untuk kontras lebih baik */
+            line-height: 1.4;
+        }
+        .biodata-card strong {
+            color: #a3d9ff; /* Warna berbeda untuk label */
+        }
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .biodata-card {
+                width: 230px;
+                padding: 18px 14px;
+            }
+            .biodata-card h3 {
+                font-size: 1.1em;
+            }
+            .biodata-card p {
+                font-size: 0.9em;
+            }
+        }
+        @media (max-width: 600px) {
+            .slide {
+                flex-direction: column;
+                align-items: center;
+            }
+            .biodata-card {
+                width: 90vw;
+                margin-bottom: 20px;
+            }
+        }
+        /* Password Slide Overlay */
+        #password-overlay {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg,#61dfff 0%, #4a25ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .welcome-letter {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.8);
+            display: inline-block;
+            animation: welcomeIn 0.5s forwards;
+            background: linear-gradient(90deg, #60ff2b, #f7f433);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 6em;
+            font-weight: bold;
+        }
+        .welcome-letter:nth-child(1) { animation-delay: 0s; }
+        .welcome-letter:nth-child(2) { animation-delay: 0.12s; }
+        .welcome-letter:nth-child(3) { animation-delay: 0.24s; }
+        .welcome-letter:nth-child(4) { animation-delay: 0.36s; }
+        .welcome-letter:nth-child(5) { animation-delay: 0.48s; }
+        .welcome-letter:nth-child(6) { animation-delay: 0.60s; }
+        .welcome-letter:nth-child(7) { animation-delay: 0.72s; }
+        @keyframes welcomeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        /* Footer and about section styles - PERBAIKAN: Meningkatkan kontras */
+        .footer-text {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 48px;
+            text-align: center;
+            color: #fff;
+            font-size: 1.3em;
+            opacity: 0.95;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+            font-weight: bold;
+        }
+        .footer-copyright {
+            position: fixed;
+            bottom: 12px;
+            right: 18px;
+            color: #fff;
+            font-size: 0.5em;
+            opacity: 0.9;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+        }
+        .about-section {
+            background: rgba(255,255,255,0.95); /* Lebih opaque untuk kontras lebih baik */
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            padding: 24px 32px;
+            margin: 0 auto 32px auto;
+            max-width: 900px;
+            width: 64vw;
+            text-align: center;
+        }
+        .about-section h2 {
+            margin-top: 0;
+            color: #0072ff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .about-section p {
+            margin-bottom: 0;
+            color: #222; /* Warna lebih gelap untuk kontras lebih baik */
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Slide Overlay -->
+    <div id="password-overlay">
+        <div style="display:flex;justify-content:center;gap:0.1em;margin-bottom:24px;">
+            <span class="welcome-letter">S</span>
+            <span class="welcome-letter">E</span>
+            <span class="welcome-letter">A</span>
+            <span class="welcome-letter">V</span>
+            <span class="welcome-letter">E</span>
+            <span class="welcome-letter">N</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.95);padding:40px 32px;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,0.25);text-align:center;">
+            <h2 style="margin-bottom:24px;color:#0072ff;">Enter Password</h2>
+            <input id="password-input" type="password" placeholder="Password" style="padding:12px 16px;font-size:1.2em;border-radius:8px;border:1px solid #ccc;outline:none;width:220px;margin-bottom:16px;">
+            <br>
+            <button id="password-submit" style="padding:10px 32px;font-size:1em;border-radius:8px;background:#0072ff;color:#fff;border:none;cursor:pointer;">Enter</button>
+            <div id="password-error" style="color:red;margin-top:12px;display:none;">password salah, coba lagi.</div>
+        </div>
+        <div id="greeting-card" style="background:rgba(255,255,255,0.85);padding:24px 32px;border-radius:18px;box-shadow:0 4px 24px rgba(0,0,0,0.15);margin-top:32px;min-width:320px;max-width:90vw;text-align:center;">
+            <div id="greeting-text" style="font-size:2em;font-weight:bold;color:#0072ff;margin-bottom:8px;"></div>
+            <div id="greeting-date" style="font-size:1.2em;color:#333;"></div>
+            <div id="greeting-time" style="font-size:1.1em;color:#555;margin-top:6px;"></div>
+        </div>
+    </div>
+
+    <h2 class="title">OUR SEAVEN CLASS </h2>
+
+    <div class="slider-container">
+        <div class="slides-wrapper" id="slides-wrapper">
+            <!-- Slides will be injected here from JS -->
+        </div>
+    </div>
+
+    <div class="footer-text">
+        DATA INI DIAMBIL PADA TAHUN 2025 (TIDAK PASTI)
+    </div>
+    <div class="about-section">
+        <h2>Thanks To :</h2>
+        <p>Dama, dan para Supporter<br>Creator Social Media: (Dama: @0nim_my) & (kelas7: @smpksevengrade_7)</p>
+    </div>
+    <div class="footer-copyright">
+        &copy;X-ALPHA
+
+    <script>
+        // Password logic
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            const correct = "Xalpha"; // password
+            if(input === correct) {
+                document.getElementById('password-overlay').style.display = 'none';
+            } else {
+                const err = document.getElementById('password-error');
+                err.style.display = 'block';
+                setTimeout(() => err.style.display = 'none', 3000);
+            }
+        }
+        document.getElementById('password-submit').addEventListener('click', checkPassword);
+        document.getElementById('password-input').addEventListener('keydown', function(e){
+            if(e.key === 'Enter') checkPassword();
+        });
+
+        // Greeting Card Logic
+        function updateGreetingCard() {
+            const greetingText = document.getElementById('greeting-text');
+            const greetingDate = document.getElementById('greeting-date');
+            const greetingTime = document.getElementById('greeting-time');
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting;
+            if (hour >= 5 && hour < 12) {
+                greeting = "Good Morning!";
+            } else if (hour >= 12 && hour < 18) {
+                greeting = "Good Afternoon!";
+            } else if (hour >= 18 && hour < 22) {
+                greeting = "Good Evening!";
+            } else {
+                greeting = "Good Night!";
+            }
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            const dayName = days[now.getDay()];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            const pad = n => n.toString().padStart(2, '0');
+            const timeStr = pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+            greetingText.textContent = greeting;
+            greetingDate.textContent = `${dayName}, ${day} ${month} ${year}`;
+            greetingTime.textContent = `Time: ${timeStr}`;
+        }
+        updateGreetingCard();
+        setInterval(updateGreetingCard, 1000);
+
+        // All biodata cards as strings - DIPERBAIKI: Menambahkan gambar placeholder dan data yang lengkap
+        const allCards = [
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/t10mkybq99e18ngs9sd9z/WhatsApp-Image-2025-10-07-at-06.08.50.png?rlkey=4jt5b0afpven09qs7upsr9if3&st=6ctc1qbj&raw=1" alt="gambar wajah">
+                <h3>PREMA</h3>
+                <p><strong>HOBBY:</strong> main futsal/bola</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 19 Cakranegara</p>
+                <p><strong>CITA-CITA:</strong> pemain bola/polisi</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/j8vllw9n7c2gm3sw7ni0c/WhatsApp-Image-2025-10-06-at-19.08.55.png?rlkey=drc2v3vb14n4hq3nljfm7vzkg&st=6u7lt1t4&raw=1" alt="gambar wajah">
+                <h3>CANDRA</h3>
+                <p><strong>HOBBY:</strong> hilling</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 2 Batulayar barat</p>
+                <p><strong>CITA-CITA:</strong> drummer</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/fy0okbr4u25ec2orlacsu/Screenshot-2025-10-17-201807.png?rlkey=nbbc6854knp4ynu7w22yun6j7&st=3nd3gdyd&raw=1" alt="gambar wajah">
+                <h3>TINA</h3>
+                <p><strong>HOBBY:</strong> traveling</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 5 Ampenan</p>
+                <p><strong>CITA-CITA:</strong> aktor</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/jyz2e8y444z7ndwn7x0jz/WhatsApp-Image-2025-10-06-at-17.57.31.png?rlkey=t7pf4p1qlzt9geaek5mlr8uak&st=n6ogd7ss&raw=1" alt="gambar wajah">
+                <h3>ANDRI</h3>
+                <p><strong>HOBBY:</strong> trail running</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> akpol</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/dwn0uzehnid38wwsg9rzl/WhatsApp-Image-2025-10-06-at-16.54.24.png?rlkey=y9kl08javqeq5n36fnl6cixyu&st=ue6z2j5d&raw=1" alt="gambar wajah">
+                <h3>NENDRA</h3>
+                <p><strong>HOBBY:</strong> baca manga dan main basket</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 1 Meninting</p>
+                <p><strong>CITA-CITA:</strong> dokter</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/89kjv31ztkeqe3rurynue/WhatsApp-Image-2025-10-06-at-18.12.11.png?rlkey=2ow2opn0kha8wfatig6lz1tq9&st=4ahitl3b&raw=1" alt="gambar wajah">
+                <h3>EUDIA</h3>
+                <p><strong>HOBBY:</strong> berenang</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> dokter kecantikan</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/pnn1x476f9fc2th1g4ru1/WhatsApp-Image-2025-10-06-at-16.39.49.png?rlkey=gz2x7tu4s012komvwx73f9kyl&st=da2gwtiy&raw=1" alt="gambar wajah">
+                <h3>ABIR</h3>
+                <p><strong>HOBBY:</strong> berenang</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 5 Ampenan</p>
+                <p><strong>CITA-CITA:</strong> pramugari</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/sxv3y8xxsjao674dvcnwl/WhatsApp-Image-2025-10-06-at-21.53.37.png?rlkey=dh8qdjv7pxillotagtwo9i3uy&st=13qwx6qv&raw=1" alt="gambar wajah">
+                <h3>GRACIA</h3>
+                <p><strong>HOBBY:</strong> main</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> BEA CUKAI</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/zc19rzww9r5frg0vadfzz/WhatsApp-Image-2025-10-06-at-18.11.22.png?rlkey=otb6m0d0syslgb2d7e18d275z&st=ykyg5fbp&raw=1" alt="gambar wajah">
+                <h3>BETRAND</h3>
+                <p><strong>HOBBY:</strong> berenang</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> DR. Anak</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/w4pqerlis6yp20qk1f6w3/WhatsApp-Image-2025-10-06-at-18.43.13.png?rlkey=l9rm7h5uczrzuwqcqcm0pmgyf&st=iip62a8o&raw=1" alt="gambar wajah">
+                <h3>KHAILA</h3>
+                <p><strong>HOBBY:</strong> dance</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> pramugari</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/qq7qkhvfjl7n36x66xle5/WhatsApp-Image-2025-10-06-at-16.53.02.png?rlkey=fq57j7pqvz2uitdyut4fzwy23&st=mrp9u5ez&raw=1" alt="gambar wajah">
+                <h3>KALMANI</h3>
+                <p><strong>HOBBY:</strong> main game</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> arkeolog</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/5q2vls6q53n3bb8ix03o3/WhatsApp-Image-2025-10-06-at-16.44.05.png?rlkey=fc122krhcq5kmqz1lv45vkf7z&st=kia285rk&raw=1" alt="gambar wajah">
+                <h3>KAYLEEN</h3>
+                <p><strong>HOBBY:</strong> belajar</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> beautycian</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://dl.dropbox.com/scl/fi/wnuyb3d84uzxchyb72yue/WhatsApp-Image-2025-10-06-at-18.44.36.png?rlkey=vbk2nb1qa15jg40soxmjv75ro&st=f3h9x7qp&raw=1" alt="gambar wajah">
+                <h3>QEISAN</h3>
+                <p><strong>HOBBY:</strong> nyanyi</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> hakim</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/ux73rdmu93ii1f9izdy74/WhatsApp-Image-2025-10-06-at-16.40.54.jpeg?rlkey=jsly5y05of08ck8d4lviflpmi&st=1efiagss&raw=1" alt="gambar wajah">
+                <h3>DEON</h3>
+                <p><strong>HOBBY:</strong> main catur</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> pemain catur</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/4qpm26i9l9ak1cyco6xfr/WhatsApp-Image-2025-09-24-at-16.31.00-1.png?rlkey=1pxczjbvhc2bjs5h98rf2nzfz&st=cvajn9oz&raw=1" alt="gambar wajah">
+                <h3>SABRINA</h3>
+                <p><strong>HOBBY:</strong> main catur</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> akpol</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/6zexrfvrpzmktxw0ry5ic/WhatsApp-Image-2025-10-06-at-18.38.12.jpeg?rlkey=eopftxbl6ewmzeednm60ejffv&st=rfm68edd&raw=1" alt="gambar wajah">
+                <h3>NUEL</h3>
+                <p><strong>HOBBY:</strong> mancing</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 1 Yeh kuning, Bali</p>
+                <p><strong>CITA-CITA:</strong> kerja di pesiar, pelukis</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/tmrk3hcy00o9804mynnbk/WhatsApp-Image-2025-10-06-at-18.19.09.png?rlkey=t91emtvl3fj43uu5jxruaod8o&st=ldm3exyx&raw=1" alt="gambar wajah">
+                <h3>JIONA</h3>
+                <p><strong>HOBBY:</strong> dance</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> orang sukses</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/gywb7322cu40nodijpyc1/WhatsApp-Image-2025-10-06-at-16.53.13.png?rlkey=4mgff5z0d53bi3ie2f33a3coo&st=r9s4ixky&raw=1" alt="gambar wajah">
+                <h3>SATRIA</h3>
+                <p><strong>HOBBY:</strong> bersepeda</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 4 Mataram</p>
+                <p><strong>CITA-CITA:</strong> TNI AD</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/61suuvpn72s7srzkdnvzx/WhatsApp-Image-2025-10-06-at-16.58.13.jpeg?rlkey=64sw3zx7fj0lyf139gb9adenp&st=egkpq6vn&raw=1" alt="gambar wajah">
+                <h3>HENDRA</h3>
+                <p><strong>HOBBY:</strong> olahraga</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 1 Meninting</p>
+                <p><strong>CITA-CITA:</strong> chef</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/bc0bhm7kbn1vdf0gmasi0/WhatsApp-Image-2025-10-06-at-16.51.46.png?rlkey=sgo1e0c84qzbxds113d1kcf0s&st=h8sidkh8&raw=1" alt="gambar wajah">
+                <h3>SYAKILA</h3>
+                <p><strong>HOBBY:</strong> JALAN-JALAN</p>
+                <p><strong>ASAL SEKOLAH:</strong> MI ALLITTIHADUL ISLAMIYAH AMPENAN</p>
+                <p><strong>CITA-CITA:</strong> polwan</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/vbsw41cms7e70iekrhwm5/WhatsApp-Image-2025-10-06-at-18.01.27.png?rlkey=6c2bjq9g3nbgynvw6pmvc30xu&st=ujdqxbcw&raw=1" alt="gambar wajah">
+                <h3>YOEL</h3>
+                <p><strong>HOBBY:</strong> cross cyling</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 13 Ampenan</p>
+                <p><strong>CITA-CITA:</strong> bos sawit</p>
+            </div>`,
+            `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/8305pvu0ukonh1fwwb1kr/WhatsApp-Image-2025-10-06-at-16.45.21.png?rlkey=mompvbge9l6t4lc1581byahnm&st=bft86jnc&raw=1" alt="gambar wajah">
+                <h3>RYU</h3>
+                <p><strong>HOBBY:</strong> main badminton</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDN 08 Ampenan</p>
+                <p><strong>CITA-CITA:</strong> atlet badminton</p>
+            </div>`,
+             `<div class="biodata-card">
+                <img src="https://www.dropbox.com/scl/fi/n890m1hjy68ehrdtvwuzs/WhatsApp-Image-2025-10-07-at-20.41.42.png?rlkey=l88kg71aeosxz5h87qriuwxre&st=lxyelc6r&raw=1" alt="gambar wajah">
+                <h3>DAMA</h3>
+                <p><strong>HOBBY:</strong>coding, gitar, basket</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> programer</p>
+            </div>`,
+               `<div class="biodata-card">
+                <img src="https://dl.dropboxusercontent.com/scl/fi/hha6w84d944nc92cbtv3p/WhatsApp-Image-2025-10-06-at-18.47.53.png?rlkey=mam34ivkxb7q84zpc6m1l1cch&st=hmp15tg3" alt="gambar wajah">
+                <h3>DAVID</h3>
+                <p><strong>HOBBY:</strong>main bola</p>
+                <p><strong>ASAL SEKOLAH:</strong> SDK Ampenan</p>
+                <p><strong>CITA-CITA:</strong> pengusaha</p>
+            </div>`
+        ];
+
+        // Helper functions to chunk cards into slides
+        function chunkArray(arr, chunkSize) {
+            const chunks = [];
+            for(let i=0; i < arr.length; i+=chunkSize){
+                chunks.push(arr.slice(i, i+chunkSize));
+            }
+            return chunks;
+        }
+        function getSlides(cards, slidesCount, cardsPerSlide) {
+            let extendedCards = [...cards];
+            while (extendedCards.length < slidesCount * cardsPerSlide) {
+                extendedCards = extendedCards.concat(cards);
+            }
+            extendedCards = extendedCards.slice(0, slidesCount * cardsPerSlide);
+            return chunkArray(extendedCards, cardsPerSlide);
+        }
+        const totalSlides = 12;
+        const cardsPerSlide = 2;
+        const slides = getSlides(allCards, totalSlides, cardsPerSlide);
+
+        const slidesWrapper = document.getElementById('slides-wrapper');
+        slidesWrapper.innerHTML = slides.map(slideCards => {
+            return `<div class="slide">${slideCards.join('')}</div>`;
+        }).join('');
+
+        let currentSlide = 0;
+        function updateSlidePosition() {
+            const offset = -currentSlide * 100;
+            slidesWrapper.style.transform = `translateX(${offset}%)`;
+        }
+        updateSlidePosition();
+
+        // Automatic slide transition every 10 seconds
+        setInterval(() => {
+            currentSlide++;
+            if (currentSlide >= totalSlides) {
+                currentSlide = 0;
+            }
+            updateSlidePosition();
+        }, 10000);
+    </script>
+</body>
+</html>
